@@ -29,9 +29,24 @@ END
   return 0
 }
 
+function terraform::run_tf(){
+  terraform init 
+  terraform validate 
+  terraform apply 
+}
+function terraform::export_var(){
+  ENVIRONMENT_ID=$(terraform output environment-id | sed -e 's/"//g')
+  CLUSTER_ID=$(terraform output cluster-id | sed -e 's/"//g')
+  SA=$(terraform output sa-manager | sed -e 's/"//g')
+  SA_KEY=$(terraform output sa-manager_key | sed -e 's/"//g')
+  SA_SECRET=$(terraform output sa-manager_secret | sed -e 's/"//g')
+  KSQLDB_NAME=ksqldb_demo
+}
+
+
 ### Enable Schema registry 
 function ccloud::enable_schema_registry() {
-  confluent environment use $ENVIRONMENT
+  confluent environment use $ENVIRONMENT_ID
   OUTPUT=$(confluent schema-registry cluster enable --cloud $CLOUD_SR --geo $REGION_SR -o json)
   SCHEMA_REGISTRY=$(echo "$OUTPUT" | jq -r ".id")
   SCHEMA_REGISTRY_ENDPOINT=$(echo "$OUTPUT" | jq -r ".endpoint_url")
@@ -58,18 +73,4 @@ function ccloud::create_ksqldb_app() {
   echo $KSQLDB_URL
 
   return 0
-}
-
-function terraform::run_tf(){
-  terraform init 
-  terraform validate 
-  terraform apply 
-}
-function terraform::export_var(){
-  ENVIRONMENT=$(terraform output environment-id | sed -e 's/"//g')
-  CLUSTER_ID=$(terraform output cluster-id | sed -e 's/"//g')
-  SA=$(terraform output sa-manager | sed -e 's/"//g')
-  SA_KEY=$(terraform output sa-manager_key | sed -e 's/"//g')
-  SA_SECRET=$(terraform output sa-manager_secret | sed -e 's/"//g')
-  KSQLDB_NAME=ksqldb_demo
 }

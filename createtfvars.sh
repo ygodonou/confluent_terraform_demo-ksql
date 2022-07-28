@@ -10,7 +10,7 @@ ENVIRONMENT="${ENVIRONMENT:-demo-env}"
 TERRITORY="${TERRITORY:-US}"
 
 cat > terraform.tfvars << EOF
-environment = "staging-va"
+environment = "$ENVIRONMENT"
 cluster_type = "basic"
 cluster_name = "$CLUSTER_NAME"
 kafka_cluster = {
